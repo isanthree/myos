@@ -1,6 +1,6 @@
-GPPPARAMS = -m32
+GPPPARAMS = -m32 -fno-use-cxa-atexit -fleading-underscore -fno-exceptions -nostdlib -fno-rtti -fno-pie
 ASPARAMS = --32
-LDPARAMS = -melf_i386
+LDPARAMS = -melf_i386 -no-pie
 
 objects = loader.o kernel.o
 
@@ -15,3 +15,6 @@ mykernel.bin: linker.ld ${objects}
 
 install: mykernel.bin
 	sudo cp $< /boot/mykernel.bin
+
+clean:
+	rm -rf *.o
