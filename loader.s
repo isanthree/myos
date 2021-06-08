@@ -1,6 +1,6 @@
-.set MAGIC, 0x1badb002  ; GRUB 魔术块
-.set FLAGS, (1<<0 | 1<<1)  ; GRUB 标志块
-.set CHECKSUM, -(MAGIC + FLAGS)  ; 校验块
+.set MAGIC, 0x1badb002
+.set FLAGS, (1<<0 | 1<<1)
+.set CHECKSUM, -(MAGIC + FLAGS)
 
 .section .multboot
 	.long MAGIC
@@ -8,7 +8,7 @@
 	.long CHECKSUM
 
 .section .text
-.extern kernelMain  ; kernelMain是外部函数
+.extern kernelMain
 .global loader
 
 loader:
@@ -18,6 +18,6 @@ loader:
     call kernelMain
 
 .section .bss
-.space 2*1024*1024  ; 开辟 2MB 内存空间
+.space 2*1024*1024
 
 kernel_stack:
