@@ -37,6 +37,7 @@ public:
 
     // 定义函数获取代码段
     uint16_t CodeSegmentDescriptor();  // 函数名用大写，成员用小写
+    // 定义函数获取代码段
     uint16_t DataSegmentDescriptor();
 };
 
