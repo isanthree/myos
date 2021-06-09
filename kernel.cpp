@@ -1,7 +1,9 @@
+#include "types.h"
+
 // 获取显示器的物理地址
 void printf(char* str)
 {
-    unsigned short* VideoMemory = (unsigned short*)0xb8000;  
+    static uint16_t* VideoMemory = (uint16_t*)0xb8000;  // 改为static
     // 取出低16位，高位不取
     for(int i=0; str[i]; i++)
     {
@@ -22,7 +24,7 @@ extern "C" void callConstructors()
     }
 }
 
-extern "C" void kernelMain(void* multiboot_structure, unsigned int magicnumber)
+extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 {
     printf((char*)"hello world!");
     while(1);
