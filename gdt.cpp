@@ -34,9 +34,9 @@ uint16_t GlobalDescriptorTable::CodeSegmentDescriptor()
 GlobalDescriptorTable::SegmentDescriptor::SegmentDescriptor(uint32_t base, uint32_t limit, uint8_t type)
 {
     uint8_t* target = (uint8_t*)this;
-    if (limit < 65536)
+    if (limit < 1048576)  // 2^20=1048576
     {
-        target[6] = 0x80;  // 23号位G 设置为 1
+        target[6] = 0x40;  // 22号位D/B 设置为 1
     } else {
         if ((limit & 0xfff) != 0xfff) {
             limit = (limit >> 12) - 1;
