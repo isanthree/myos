@@ -2,7 +2,7 @@
 #include "gdt.h"
 
 // 获取显示器的物理地址
-void printf(char* str)
+void printf(const char* str)
 {
     static uint16_t* VideoMemory = (uint16_t*)0xb8000;  // 改为static
     static uint8_t x = 0, y = 0;
@@ -59,8 +59,8 @@ extern "C" void callConstructors()
 
 extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 {
-    printf((char*)"hello world!\n");
-    printf((char*)"cpp");
+    printf("hello world!\n");
+    printf("cpp");
 
     GlobalDescriptorTable gdt;
     while(1);
