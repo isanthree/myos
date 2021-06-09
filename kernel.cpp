@@ -1,4 +1,5 @@
 #include "types.h"
+#include "gdt.h"
 
 // 获取显示器的物理地址
 void printf(char* str)
@@ -27,5 +28,7 @@ extern "C" void callConstructors()
 extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 {
     printf((char*)"hello world!");
+
+    GlobalDescriptorTable gdt;
     while(1);
 }
