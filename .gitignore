@@ -2,5 +2,6 @@ notes
 
 *.o
 *.bin
+*.iso
 
 fp.sh
