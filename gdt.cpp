@@ -18,14 +18,14 @@ GlobalDescriptorTable::GlobalDescriptorTable()
 GlobalDescriptorTable::~GlobalDescriptorTable() {}
 
 // 定义函数获取数据段
-uint16_t GlobalDescriptorTable::DataSegmentDescriptor()
+uint16_t GlobalDescriptorTable::DataSegmentSelector()
 {
     // 返回段内偏移
     return (uint8_t*)&dataSegmentDescriptor - (uint8_t*)this;
 }
 
 // 定义函数获取代码段
-uint16_t GlobalDescriptorTable::CodeSegmentDescriptor()
+uint16_t GlobalDescriptorTable::CodeSegmentSelector()
 {
     // 返回段内偏移
     return (uint8_t*)&codeSegmentDescriptor - (uint8_t*)this;
