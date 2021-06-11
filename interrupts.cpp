@@ -78,24 +78,24 @@ InterruptManager::InterruptManager(uint16_t hardwareInterruptOffset, GlobalDescr
 
     // 往 8295A芯片（中断控制器）端口写东西
     // ICW1
-    picMasterCommand.write(0x11);  // 该语句是惯用写法
-    picSlaveCommad.write(0x11);
+    picMasterCommand.Write(0x11);  // 该语句是惯用写法
+    picSlaveCommad.Write(0x11);
 
     // ICW2
-    picMasterData.write(hardwareInterruptOffset);
-    picSlaveData.write(hardwareInterruptOffset + 8);  // 8位 之后继续寻找 8位
+    picMasterData.Write(hardwareInterruptOffset);
+    picSlaveData.Write(hardwareInterruptOffset + 8);  // 8位 之后继续寻找 8位
 
     // ICW3
-    picMasterData.write(0x04);
-    picSlaveData.write(0x02);
+    picMasterData.Write(0x04);
+    picSlaveData.Write(0x02);
 
     // ICW4
-    picMasterData.write(0x01);
-    picSlaveData.write(0x01);
+    picMasterData.Write(0x01);
+    picSlaveData.Write(0x01);
 
     // 触发中断，即不屏蔽中断请求
-    picMasterData.write(0x00);
-    picSlaveData.write(0x00);
+    picMasterData.Write(0x00);
+    picSlaveData.Write(0x00);
 
     InterruptDescriptorTablePointer idt;
     idt.size = 256 * sizeof(GateDescriptor) - 1;
@@ -144,7 +144,17 @@ uint32_t InterruptManager::handleInterrupt(uint8_t interruptNumber, uint32_t esp
 
 uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t esp)
 {
-    printf("\nResult of pressing keyboard: The interrupt was triggered.\n");
+    if (interruptNumber != hardwareInterruptOffset)  // 如果不是时钟中断（时钟中断是从0开始的）
+        printf("\nResult of pressing keyboard: The interrupt was triggered.\n");
+    // 判断是否为硬件中断，如果是的话：
+    if (hardwareInterruptOffset <= interruptNumber && interruptNumber < hardwareInterruptOffset + 16)
+    {
+        picMasterCommand.Write(0x20);  // EOI 对应的 OCW2 的值为 0x20
+        if (interruptNumber >= hardwareInterruptOffset + 8)
+        {
+            picMasterCommand.Write(0x20);
+        }
+    }
     return esp;
 }
 
