@@ -1,10 +1,11 @@
+.set IRQ_BASE, 0x20
 .section .text
 .extern __ZN16InterruptManager15handleInterruptEhj
 
 .macro HandleInterruptRequest num
 .global __ZN16InterruptManager26HandleInterruptRequest\num\()Ev
 __ZN16InterruptManager26HandleInterruptRequest\num\()Ev:
-    movb $\num, (interruptnumber)
+    movb $\num + IRQ_BASE, (interruptnumber)
     jmp int_bottom
 .endm
 
