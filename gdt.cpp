@@ -21,14 +21,14 @@ GlobalDescriptorTable::~GlobalDescriptorTable() {}
 uint16_t GlobalDescriptorTable::DataSegmentSelector()
 {
     // 返回段内偏移
-    return (uint8_t*)&dataSegmentDescriptor - (uint8_t*)this;
+    return ((uint8_t*)&dataSegmentDescriptor - (uint8_t*)this) << 3;
 }
 
 // 定义函数获取代码段
 uint16_t GlobalDescriptorTable::CodeSegmentSelector()
 {
     // 返回段内偏移
-    return (uint8_t*)&codeSegmentDescriptor - (uint8_t*)this;
+    return ((uint8_t*)&codeSegmentDescriptor - (uint8_t*)this) << 3;
 }
 
 GlobalDescriptorTable::SegmentDescriptor::SegmentDescriptor(uint32_t base, uint32_t limit, uint8_t type)
