@@ -33,6 +33,12 @@ InterruptManager::InterruptManager(uint16_t hardwareInterruptOffset, GlobalDescr
         SetInterruptDescriptorTableEntry(i, CodeSegment, &InterruptIgnore, 0, IDT_INTERRUPT_GATE);  // 初始化
     }
 
+    InterruptDescriptorTablePointer idt;
+    idt.size = 256 * sizeof(GateDescriptor) - 1;
+    idt.base = (uint32_t)interruptDescriptorTable;
+
+    asm volatile("lidt %0": :"m"(idt));  // "m"表示内存的意思，从内存读取到 lidt
+
     // 初始化
     SetInterruptDescriptorTableEntry(0x00, CodeSegment, &HandleException0x00, 0, IDT_INTERRUPT_GATE);
     SetInterruptDescriptorTableEntry(0x01, CodeSegment, &HandleException0x01, 0, IDT_INTERRUPT_GATE);
@@ -73,6 +79,14 @@ InterruptManager::InterruptManager(uint16_t hardwareInterruptOffset, GlobalDescr
     SetInterruptDescriptorTableEntry(hardwareInterruptOffset+0x0F, CodeSegment, &HandleInterruptRequest0x0F, 0, IDT_INTERRUPT_GATE);
     SetInterruptDescriptorTableEntry(hardwareInterruptOffset+0x31, CodeSegment, &HandleInterruptRequest0x31, 0, IDT_INTERRUPT_GATE);
 
+}
+
+InterruptManager::~InterruptManager() {}  // 析构函数
+
+// 使 CPU 开启中断
+void InterruptManager::Activate()
+{
+    asm("sti");  // 开启中断
 }
 
 uint32_t InterruptManager::handleInterrupt(uint8_t interruptNumber, uint32_t esp)

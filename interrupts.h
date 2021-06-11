@@ -11,6 +11,9 @@ public:
     InterruptManager(uint16_t hardwareInterruptOffset, GlobalDescriptorTable* gdt);
     ~InterruptManager();
 
+    // 写一个方法，让 CPU 开启中断
+    void Activate();  // 实现放在构造函数下面
+
 protected:
     // 中断门描述符
     struct GateDescriptor
@@ -23,6 +26,14 @@ protected:
     } __attribute__((packed));
 
     static GateDescriptor interruptDescriptorTable[256];
+
+    // https://cdn.jsdelivr.net/gh/isanthree/blog-gallery/pic/20210610010504.png
+    // 实现 IDRT 寄存器，用来定位 IDT 表的位置
+    struct InterruptDescriptorTablePointer
+    {
+        uint16_t size;
+        uint32_t base;
+    } __attribute__((packed));
 
     // 定义中断的入口地址
     static void SetInterruptDescriptorTableEntry(
