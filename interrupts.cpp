@@ -128,6 +128,11 @@ InterruptManager::InterruptManager(uint16_t hardwareInterruptOffset, GlobalDescr
 
 InterruptManager::~InterruptManager() {}  // 析构函数
 
+uint16_t InterruptManager::HardwareInterruptOffset()
+{
+    return hardwareInterruptOffset;
+}
+
 // 使 CPU 开启中断
 void InterruptManager::Activate()
 {
@@ -171,7 +176,7 @@ uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t e
     } else if (interruptNumber != hardwareInterruptOffset)  // 如果不是时钟中断（时钟中断是从0开始的）
     {
         char* foo = (char*)"\nUNHANDLED INTERRUPT 0x00\n";
-        char* hex = "0123456789ABCDEF";
+        const char* hex = "0123456789ABCDEF";
         foo[22] = hex[(interruptNumber >> 4) & 0x0f];
         foo[23] = hex[interruptNumber & 0x0f];
 

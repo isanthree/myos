@@ -31,6 +31,7 @@ public:
     InterruptManager(uint16_t hardwareInterruptOffset, GlobalDescriptorTable* gdt);
     ~InterruptManager();
 
+    uint16_t HardwareInterruptOffset();  // to get hardwareInterruptOffset's value
     // 写一个方法，让 CPU 开启中断
     void Activate();  // 实现放在构造函数下面
     void Deactivate();  // 如果 InterruptManager 指针已经被初始化，调用该方法
