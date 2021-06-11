@@ -23,21 +23,16 @@ void InterruptManager::SetInterruptDescriptorTableEntry(
 }
 
 InterruptManager::InterruptManager(uint16_t hardwareInterruptOffset, GlobalDescriptorTable* gdt)
+    : picMasterCommand(0x20), picMasterData(0x21), picSlaveCommad(0xA0), picSlaveData(0xA1)  // 8295A 芯片端口初始化
 {
     this->hardwareInterruptOffset = hardwareInterruptOffset;
-    uint16_t CodeSegment = gdt->CodeSegmentSelector();
+    uint16_t CodeSegment = (gdt->CodeSegmentSelector()) >> 3;  // 偏移 3位，修复 bug，否则无法实现中断
 
     const uint8_t IDT_INTERRUPT_GATE = 0xe;  // 中断门是 1110b
     for(uint16_t i=0; i<256; i++)
     {
         SetInterruptDescriptorTableEntry(i, CodeSegment, &InterruptIgnore, 0, IDT_INTERRUPT_GATE);  // 初始化
     }
-
-    InterruptDescriptorTablePointer idt;
-    idt.size = 256 * sizeof(GateDescriptor) - 1;
-    idt.base = (uint32_t)interruptDescriptorTable;
-
-    asm volatile("lidt %0": :"m"(idt));  // "m"表示内存的意思，从内存读取到 lidt
 
     // 初始化
     SetInterruptDescriptorTableEntry(0x00, CodeSegment, &HandleException0x00, 0, IDT_INTERRUPT_GATE);
@@ -79,6 +74,33 @@ InterruptManager::InterruptManager(uint16_t hardwareInterruptOffset, GlobalDescr
     SetInterruptDescriptorTableEntry(hardwareInterruptOffset+0x0F, CodeSegment, &HandleInterruptRequest0x0F, 0, IDT_INTERRUPT_GATE);
     SetInterruptDescriptorTableEntry(hardwareInterruptOffset+0x31, CodeSegment, &HandleInterruptRequest0x31, 0, IDT_INTERRUPT_GATE);
 
+    // 往 8295A芯片（中断控制器）端口写东西
+    // ICW1
+    picMasterCommand.write(0x11);  // 该语句是惯用写法
+    picSlaveCommad.write(0x11);
+
+    // ICW2
+    picMasterData.write(hardwareInterruptOffset);
+    picSlaveData.write(hardwareInterruptOffset + 8);  // 8位 之后继续寻找 8位
+
+    // ICW3
+    picMasterData.write(0x04);
+    picSlaveData.write(0x02);
+
+    // ICW4
+    picMasterData.write(0x01);
+    picSlaveData.write(0x01);
+
+    // 触发中断，即不屏蔽中断请求
+    picMasterData.write(0x00);
+    picSlaveData.write(0x00);
+
+    InterruptDescriptorTablePointer idt;
+    idt.size = 256 * sizeof(GateDescriptor) - 1;
+    idt.base = (uint32_t)interruptDescriptorTable;
+
+    asm volatile("lidt %0": :"m"(idt));  // "m"表示内存的意思，从内存读取到 lidt
+
 }
 
 InterruptManager::~InterruptManager() {}  // 析构函数
@@ -91,7 +113,7 @@ void InterruptManager::Activate()
 
 uint32_t InterruptManager::handleInterrupt(uint8_t interruptNumber, uint32_t esp)
 {
-    printf("interrupt");
+    printf("\nResult of pressing keyboard: The interrupt was triggered.\n");
     return esp;
 }
 

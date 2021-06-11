@@ -91,6 +91,11 @@ protected:
     static void HandleException0x12();
     static void HandleException0x13();
 
+    Port8BitSlow picMasterCommand;
+    Port8BitSlow picMasterData;
+    Port8BitSlow picSlaveCommad;
+    Port8BitSlow picSlaveData;
+
 }__attribute__((packed));
 
 #endif
