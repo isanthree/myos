@@ -8,6 +8,35 @@
 class InterruptManager
 {
 public:
+    InterruptManager(uint16_t hardwareInterruptOffset, GlobalDescriptorTable* gdt);
+    ~InterruptManager();
+
+protected:
+    // 中断门描述符
+    struct GateDescriptor
+    {
+        uint16_t handleAddressLowBits;
+        uint16_t gdt_codeSegmentSelector;
+        uint8_t reserved;  // 保留
+        uint8_t access;  // 访问控制
+        uint16_t handleAddressHighBits;
+    } __attribute__((packed));
+
+    static GateDescriptor interruptDescriptorTable[256];
+
+    // 定义中断的入口地址
+    static void SetInterruptDescriptorTableEntry(
+        uint8_t interruptNumber,  // 中断编号
+        uint16_t codeSegmentSelectorOffset,
+        void (*handler)(),  //函数指针
+        uint8_t DescriptorPrivilegelLevel,  // descriptor 的级别
+        uint8_t DescriptorType
+    );
+
+    uint16_t hardwareInterruptOffset;
+
+    static void InterruptIgnore();
+
     static uint32_t handleInterrupt(uint8_t InterruptNumber, uint32_t esp);  // 定义一个静态函数，使其处理一些中断的请求
 
     // 处理编号为 0xXX 的中断，需要实现对应的汇编
