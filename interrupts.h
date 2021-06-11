@@ -13,8 +13,11 @@ public:
 
     // 写一个方法，让 CPU 开启中断
     void Activate();  // 实现放在构造函数下面
+    void Deactivate();  // 如果 InterruptManager 指针已经被初始化，调用该方法
 
 protected:
+    static InterruptManager* ActivateInterruptManager;
+
     // 中断门描述符
     struct GateDescriptor
     {
@@ -49,6 +52,7 @@ protected:
     static void InterruptIgnore();
 
     static uint32_t handleInterrupt(uint8_t InterruptNumber, uint32_t esp);  // 定义一个静态函数，使其处理一些中断的请求
+    uint32_t DoHandleInterrupt(uint8_t InterruptNumber, uint32_t esp);  // 定义一个非静态方法
 
     // 处理编号为 0xXX 的中断，需要实现对应的汇编
     static void HandleInterruptRequest0x00();  // 时间中断

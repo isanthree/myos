@@ -5,6 +5,8 @@
 void printf(const char*);
 
 InterruptManager::GateDescriptor InterruptManager::interruptDescriptorTable[256];  // 存了256个中断
+ 
+InterruptManager* InterruptManager::ActivateInterruptManager = 0;  // 初值为 0
 
 void InterruptManager::SetInterruptDescriptorTableEntry(
     uint8_t interruptNumber,
@@ -108,10 +110,39 @@ InterruptManager::~InterruptManager() {}  // 析构函数
 // 使 CPU 开启中断
 void InterruptManager::Activate()
 {
+    if (ActivateInterruptManager != 0)  // 不等于 0，说明被初始化过了
+    {
+        ActivateInterruptManager->Deactivate();
+    }
+    // 等于 0，则：
+    ActivateInterruptManager = this;
+
     asm("sti");  // 开启中断
 }
 
+// 使 CPU 关闭中断
+void InterruptManager::Deactivate()
+{
+    // 等于 this，重新赋值为 0，调用汇编 "cli" 关闭中断
+    if (ActivateInterruptManager == this)  
+    {
+        ActivateInterruptManager = 0;
+        asm("cli");  // 
+    }
+
+}
+
 uint32_t InterruptManager::handleInterrupt(uint8_t interruptNumber, uint32_t esp)
+{
+    if (ActivateInterruptManager != 0)
+    {
+        return ActivateInterruptManager->DoHandleInterrupt(interruptNumber, esp);
+    }
+    // printf("\nResult of pressing keyboard: The interrupt was triggered.\n");
+    return esp;
+}
+
+uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t esp)
 {
     printf("\nResult of pressing keyboard: The interrupt was triggered.\n");
     return esp;
