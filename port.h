@@ -18,8 +18,8 @@ public:
     ~Port8Bit();
     // 定义写操作，使用 virtual，希望能被 overwrite。
     // 父类的指针可以使用子类的方法
-    virtual void write(uint8_t data);  
-    virtual uint8_t read();  // 定义读操作
+    virtual void Write(uint8_t data);  
+    virtual uint8_t Read();  // 定义读操作
 };
 
 // 8位 读，继承 Port8Bit 类，慢操作
@@ -29,8 +29,8 @@ public:
     ~Port8BitSlow();
     // 定义写操作，使用 virtual，希望能被 overwrite。
     // 父类的指针可以使用子类的方法
-    virtual void write(uint8_t data);  
-    // virtual uint8_t read();  // 定义读操作
+    virtual void Write(uint8_t data);  
+    // virtual uint8_t Read();  // 定义读操作
 };
 
 // 16位 读取，继承 Port 类
@@ -39,8 +39,8 @@ public:
     Port16Bit(uint16_t portnumber);
     ~Port16Bit();
     // 定义写操作，使用 virtual，希望能被 overwrite
-    virtual void write(uint16_t data);
-    virtual uint16_t read();  // 定义读操作
+    virtual void Write(uint16_t data);
+    virtual uint16_t Read();  // 定义读操作
 };
 
 // 32位 读取，继承 Port 类
@@ -49,8 +49,8 @@ public:
     Port32Bit(uint16_t portnumber);
     ~Port32Bit();
     // 定义写操作，使用 virtual，希望能被 overwrite
-    virtual void write(uint32_t data);
-    virtual uint32_t read();  // 定义读操作
+    virtual void Write(uint32_t data);
+    virtual uint32_t Read();  // 定义读操作
 };
 
 // 8位 读取，继承 Port 类
@@ -59,8 +59,8 @@ public:
     Port64Bit(uint16_t portnumber);
     ~Port64Bit();
     // 定义写操作，使用 virtual，希望能被 overwrite
-    virtual void write(uint64_t data);
-    virtual uint64_t read();  // 定义读操作
+    virtual void Write(uint64_t data);
+    virtual uint64_t Read();  // 定义读操作
 };
 
 #endif
