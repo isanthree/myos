@@ -4,6 +4,26 @@
 
 void printf(const char*);
 
+InterruptHandler::InterruptHandler(uint8_t interruptNumber, InterruptManager* interruptManager)
+{
+    this->interruptNumber = interruptNumber;
+    this->interruptManager = interruptManager;
+    interruptManager->handlers[interruptNumber] = this;
+}
+
+InterruptHandler::~InterruptHandler() 
+{
+    if (interruptManager->handlers[interruptNumber] == this)
+    {
+        interruptManager->handlers[interruptNumber] = 0;
+    }
+}
+
+uint32_t InterruptHandler::HandleInterrupt(uint32_t esp)
+{
+    return esp;
+}
+
 InterruptManager::GateDescriptor InterruptManager::interruptDescriptorTable[256];  // 存了256个中断
  
 InterruptManager* InterruptManager::ActivateInterruptManager = 0;  // 初值为 0
@@ -33,6 +53,7 @@ InterruptManager::InterruptManager(uint16_t hardwareInterruptOffset, GlobalDescr
     const uint8_t IDT_INTERRUPT_GATE = 0xe;  // 中断门是 1110b
     for(uint16_t i=0; i<256; i++)
     {
+        handlers[i] = 0;
         SetInterruptDescriptorTableEntry(i, CodeSegment, &InterruptIgnore, 0, IDT_INTERRUPT_GATE);  // 初始化
     }
 
@@ -144,8 +165,18 @@ uint32_t InterruptManager::handleInterrupt(uint8_t interruptNumber, uint32_t esp
 
 uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t esp)
 {
-    if (interruptNumber != hardwareInterruptOffset)  // 如果不是时钟中断（时钟中断是从0开始的）
-        printf("\nResult of pressing keyboard: The interrupt was triggered.\n");
+    if (handlers[interruptNumber] != 0)
+    {
+        esp = handlers[interruptNumber]->HandleInterrupt(esp);  // 相当于恢复现场的操作 PS:中断(4)25:10
+    } else if (interruptNumber != hardwareInterruptOffset)  // 如果不是时钟中断（时钟中断是从0开始的）
+    {
+        char* foo = (char*)"\nUNHANDLED INTERRUPT 0x00\n";
+        char* hex = "0123456789ABCDEF";
+        foo[22] = hex[(interruptNumber >> 4) & 0x0f];
+        foo[23] = hex[interruptNumber & 0x0f];
+
+        printf((const char*)foo);
+    }
     // 判断是否为硬件中断，如果是的话：
     if (hardwareInterruptOffset <= interruptNumber && interruptNumber < hardwareInterruptOffset + 16)
     {

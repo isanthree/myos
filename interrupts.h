@@ -5,8 +5,28 @@
 #include "port.h"
 #include "gdt.h"
 
+class InterruptManager;
+
+// 定义一个中断相关的基类
+class InterruptHandler
+{
+public:
+    // 处理中断的方法
+    uint32_t HandleInterrupt(uint32_t esp);
+
+protected:
+    // 构造函数放在 protected 里面，即不让外界控制该构造
+    InterruptHandler(uint8_t interruptNumber, InterruptManager* interruptManager);
+    ~InterruptHandler();
+
+    uint8_t interruptNumber;
+    InterruptManager* interruptManager;
+};
+
+
 class InterruptManager
 {
+    friend class InterruptHandler;  // InterruptManager 类访问 InterruptHandler 的成员，需要设置友元类
 public:
     InterruptManager(uint16_t hardwareInterruptOffset, GlobalDescriptorTable* gdt);
     ~InterruptManager();
@@ -17,6 +37,7 @@ public:
 
 protected:
     static InterruptManager* ActivateInterruptManager;
+    InterruptHandler* handlers[256];
 
     // 中断门描述符
     struct GateDescriptor
