@@ -73,6 +73,10 @@ int_bottom:
     popl %ds
     popa
 
+.global __ZN16InterruptManager15InterruptIgnoreEv
+__ZN16InterruptManager15InterruptIgnoreEv:
+
+
     iret
 
 .data
