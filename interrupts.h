@@ -72,7 +72,7 @@ protected:
 
     static void InterruptIgnore();
 
-    static uint32_t handleInterrupt(uint8_t InterruptNumber, uint32_t esp);  // 定义一个静态函数，使其处理一些中断的请求
+    static uint32_t HandleInterrupt(uint8_t InterruptNumber, uint32_t esp);  // 定义一个静态函数，使其处理一些中断的请求
     uint32_t DoHandleInterrupt(uint8_t InterruptNumber, uint32_t esp);  // 定义一个非静态方法
 
     // 处理编号为 0xXX 的中断，需要实现对应的汇编
