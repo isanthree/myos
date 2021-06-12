@@ -2,6 +2,7 @@
 #include "gdt.h"
 #include "interrupts.h"
 #include "keyboard.h"
+#include "mouse.h"
 
 // 获取显示器的物理地址
 void printf(const char* str)
@@ -68,6 +69,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     InterruptManager interrupts(0x20, &gdt);
 
     KeyBoardDriver keyboard(&interrupts);  // 中断开启前，keyboard 进行初始化
+    MouseDriver mouse(&interrupts);
     interrupts.Activate();  // 开启中断
 
     while(1);
