@@ -23,7 +23,7 @@ void printf(const char*);
 uint32_t KeyBoardDriver::HandleInterrupt(uint32_t esp)
 {
     uint8_t key = dataport.Read();
-    char* foo = (char*)"\nUNHANDLED INTERRUPT 0x00\n";
+    char* foo = (char*)"UNHANDLED INTERRUPT 0x00\n";
     const char* hex = "0123456789ABCDEF";
     foo[22] = hex[(key >> 4) & 0x0f];
     foo[23] = hex[key & 0x0f];
