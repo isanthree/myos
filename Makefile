@@ -38,4 +38,5 @@ run: mykernel.iso
 
 .PHONY: clean
 clean:
+	cp notes.md ~/workspace/
 	rm -rf ${objects} mykernel.bin mykernel.iso
