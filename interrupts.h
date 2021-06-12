@@ -12,7 +12,7 @@ class InterruptHandler
 {
 public:
     // 处理中断的方法
-    uint32_t HandleInterrupt(uint32_t esp);
+    virtual uint32_t HandleInterrupt(uint32_t esp);  // 改成虚函数，这样可以使用泛型
 
 protected:
     // 构造函数放在 protected 里面，即不让外界控制该构造
