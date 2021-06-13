@@ -1,18 +1,22 @@
 /* coding: utf-8 */
 
 #include "gdt.h"
-// #include "types.h"
+
+using namespace myos;
+using namespace myos::common;
 
 GlobalDescriptorTable::GlobalDescriptorTable()
     : nullSegmentDescriptor(0, 0, 0),
       unusedSegmentDescriptor(0, 0, 0),
-      codeSegmentDescriptor(0, 64*1024*1024, 0x9a),
-      dataSegmentDescriptor(0, 64*1024*1024, 0x92) 
+      codeSegmentDescriptor(0, 64 * 1024 * 1024, 0x9a),
+      dataSegmentDescriptor(0, 64 * 1024 * 1024, 0x92)
 {
-    uint32_t i[2];  // 定义存放 GDT 描述符(GDT descriptor)的数组
+    uint32_t i[2]; // 定义存放 GDT 描述符(GDT descriptor)的数组
     i[1] = (uint32_t)this;
     i[0] = sizeof(GlobalDescriptorTable) << 16;
-    asm volatile("lgdt (%0)": :"p" (((uint8_t *)i)+2));
+    asm volatile("lgdt (%0)"
+                 :
+                 : "p"(((uint8_t *)i) + 2));
 }
 
 GlobalDescriptorTable::~GlobalDescriptorTable() {}
@@ -21,26 +25,31 @@ GlobalDescriptorTable::~GlobalDescriptorTable() {}
 uint16_t GlobalDescriptorTable::DataSegmentSelector()
 {
     // 返回段内偏移
-    return ((uint8_t*)&dataSegmentDescriptor - (uint8_t*)this) << 3;
+    return ((uint8_t *)&dataSegmentDescriptor - (uint8_t *)this) << 3;
 }
 
 // 定义函数获取代码段
 uint16_t GlobalDescriptorTable::CodeSegmentSelector()
 {
     // 返回段内偏移
-    return ((uint8_t*)&codeSegmentDescriptor - (uint8_t*)this) << 3;
+    return ((uint8_t *)&codeSegmentDescriptor - (uint8_t *)this) << 3;
 }
 
 GlobalDescriptorTable::SegmentDescriptor::SegmentDescriptor(uint32_t base, uint32_t limit, uint8_t type)
 {
-    uint8_t* target = (uint8_t*)this;
-    if (limit < 1048576)  // 2^20=1048576
+    uint8_t *target = (uint8_t *)this;
+    if (limit < 1048576) // 2^20=1048576
     {
-        target[6] = 0x40;  // 22号位D/B 设置为 1
-    } else {
-        if ((limit & 0xfff) != 0xfff) {
+        target[6] = 0x40; // 22号位D/B 设置为 1
+    }
+    else
+    {
+        if ((limit & 0xfff) != 0xfff)
+        {
             limit = (limit >> 12) - 1;
-        } else {
+        }
+        else
+        {
             limit = limit >> 12;
         }
         // 32位 保护模式
@@ -61,17 +70,18 @@ GlobalDescriptorTable::SegmentDescriptor::SegmentDescriptor(uint32_t base, uint3
 
 uint32_t GlobalDescriptorTable::SegmentDescriptor::Base()
 {
-    uint8_t* target = (uint8_t*)this;
+    uint8_t *target = (uint8_t *)this;
     uint32_t result = target[7];
     result = (result << 8) + target[4];
     result = (result << 8) + target[3];
     result = (result << 8) + target[2];
+
     return result;
 }
 
 uint32_t GlobalDescriptorTable::SegmentDescriptor::Limit()
 {
-    uint8_t* target = (uint8_t*)this;
+    uint8_t *target = (uint8_t *)this;
     uint32_t result = target[6] & 0xf;
     result = (result << 8) + target[1];
     result = (result << 8) + target[0];

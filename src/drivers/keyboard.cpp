@@ -1,4 +1,8 @@
-#include "keyboard.h"
+#include "drivers/keyboard.h"
+
+using namespace myos::common;
+using namespace myos::drivers;
+using namespace myos::hardwarecommunication;
 
 KeyboardEventHandler::KeyboardEventHandler() {}
 KeyboardEventHandler::~KeyboardEventHandler() {}
@@ -6,13 +10,12 @@ KeyboardEventHandler::~KeyboardEventHandler() {}
 void KeyboardEventHandler::OnKeyDown(char c) {}
 void KeyboardEventHandler::OnKeyUp(char c) {}
 
-KeyBoardDriver::KeyBoardDriver(InterruptManager* manager, KeyboardEventHandler* handler)
-    : InterruptHandler(0x01 + manager->HardwareInterruptOffset(), manager),  // keyboard 控制器对应 0x21
-    dataport(0x60),
-    commandport(0x64),
-    handler(handler)
+KeyBoardDriver::KeyBoardDriver(InterruptManager *manager, KeyboardEventHandler *handler)
+    : InterruptHandler(0x01 + manager->HardwareInterruptOffset(), manager), // keyboard 控制器对应 0x21
+      dataport(0x60),
+      commandport(0x64),
+      handler(handler)
 {
-      
 }
 
 KeyBoardDriver::~KeyBoardDriver() {}
@@ -23,20 +26,21 @@ void KeyBoardDriver::Activate()
     {
         dataport.Read();
     }
-    commandport.Write(0xae);  // 0xae 是激活键盘
-    commandport.Write(0x20);  // 键盘激活之后，读取 0x20
-    uint8_t status = (dataport.Read() | 1) & ~0x10;  // 或上 1 开启键盘中断；&：把 Bit4 置零
-    commandport.Write(0x60);  
+    commandport.Write(0xae);                        // 0xae 是激活键盘
+    commandport.Write(0x20);                        // 键盘激活之后，读取 0x20
+    uint8_t status = (dataport.Read() | 1) & ~0x10; // 或上 1 开启键盘中断；&：把 Bit4 置零
+    commandport.Write(0x60);
     dataport.Write(status);
     dataport.Write(0xf4);
 }
 
-void printf(const char*);
+void printf(const char *);
 void printfHex(uint8_t);
 uint32_t KeyBoardDriver::HandleInterrupt(uint32_t esp)
 {
     uint8_t key = dataport.Read();
-    if (handler == nullptr) return esp;    
+    if (handler == nullptr)
+        return esp;
 
     // 通过 handler 去操纵按键操作
     static bool shift = false;
@@ -93,15 +97,13 @@ uint32_t KeyBoardDriver::HandleInterrupt(uint32_t esp)
     case 0x45: break; // NumLock，暂时不支持键盘锁
 
     default:
-        if (key < 0x80) 
+        if (key < 0x80)
         {
             printf("KEYBOARD 0x");
             printfHex(key);
         }
         break;
     }
-
-    
 
     return esp;
 }

@@ -1,5 +1,8 @@
-#include "driver.h"
-#include "types.h"
+#include "drivers/driver.h"
+#include "common/types.h"
+
+using namespace myos::common;
+using namespace myos::drivers;
 
 Driver::Driver() {}
 
@@ -7,7 +10,7 @@ Driver::~Driver() {}
 
 void Driver::Activate() {}
 
-int Driver::Reset() 
+int Driver::Reset()
 {
     return 0;
 }
@@ -17,7 +20,6 @@ void Driver::Deactivate() {}
 DriverManager::DriverManager()
     : numDrivers(0)
 {
-
 }
 
 void DriverManager::AddDriver(Driver *drv)
@@ -31,5 +33,4 @@ void DriverManager::ActivateAll()
     {
         drivers[i]->Activate();
     }
-    
 }
