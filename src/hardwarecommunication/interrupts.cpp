@@ -28,7 +28,7 @@ uint32_t InterruptHandler::HandleInterrupt(uint32_t esp)
 
 InterruptManager::GateDescriptor InterruptManager::interruptDescriptorTable[256]; // 存了256个中断
 
-InterruptManager *InterruptManager::ActivateInterruptManager = 0; // 初值为 0
+InterruptManager *InterruptManager::ActiveInterruptManager = 0; // 初值为 0
 
 void InterruptManager::SetInterruptDescriptorTableEntry(
     uint8_t interruptNumber,
@@ -139,12 +139,12 @@ uint16_t InterruptManager::HardwareInterruptOffset()
 // 使 CPU 开启中断
 void InterruptManager::Activate()
 {
-    if (ActivateInterruptManager != 0) // 不等于 0，说明被初始化过了
+    if (ActiveInterruptManager != 0) // 不等于 0，说明被初始化过了
     {
-        ActivateInterruptManager->Deactivate();
+        ActiveInterruptManager->Deactivate();
     }
     // 等于 0，则：
-    ActivateInterruptManager = this;
+    ActiveInterruptManager = this;
 
     asm("sti"); // 开启中断
 }
@@ -153,18 +153,18 @@ void InterruptManager::Activate()
 void InterruptManager::Deactivate()
 {
     // 等于 this，重新赋值为 0，调用汇编 "cli" 关闭中断
-    if (ActivateInterruptManager == this)
+    if (ActiveInterruptManager == this)
     {
-        ActivateInterruptManager = 0;
+        ActiveInterruptManager = 0;
         asm("cli"); //
     }
 }
 
 uint32_t InterruptManager::HandleInterrupt(uint8_t interruptNumber, uint32_t esp)
 {
-    if (ActivateInterruptManager != 0)
+    if (ActiveInterruptManager != 0)
     {
-        return ActivateInterruptManager->DoHandleInterrupt(interruptNumber, esp);
+        return ActiveInterruptManager->DoHandleInterrupt(interruptNumber, esp);
     }
     // printf("\nResult of pressing keyboard: The interrupt was triggered.\n");
     return esp;

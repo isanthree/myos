@@ -40,7 +40,7 @@ namespace myos
             void Deactivate(); // 如果 InterruptManager 指针已经被初始化，调用该方法
 
         protected:
-            static InterruptManager *ActivateInterruptManager;
+            static InterruptManager *ActiveInterruptManager;
             InterruptHandler *handlers[256];
 
             // 中断门描述符
