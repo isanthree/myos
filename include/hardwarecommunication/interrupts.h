@@ -75,8 +75,8 @@ namespace myos
 
             static void InterruptIgnore();
 
-            static myos::common::uint32_t HandleInterrupt(myos::common::uint8_t InterruptNumber, myos::common::uint32_t esp); // 定义一个静态函数，使其处理一些中断的请求
-            myos::common::uint32_t DoHandleInterrupt(myos::common::uint8_t InterruptNumber, myos::common::uint32_t esp);      // 定义一个非静态方法
+            static myos::common::uint32_t HandleInterrupt(myos::common::uint8_t interruptNumber, myos::common::uint32_t esp); // 定义一个静态函数，使其处理一些中断的请求
+            myos::common::uint32_t DoHandleInterrupt(myos::common::uint8_t interruptNumber, myos::common::uint32_t esp);      // 定义一个非静态方法
 
             // 处理编号为 0xXX 的中断，需要实现对应的汇编
             static void HandleInterruptRequest0x00(); // 时间中断
@@ -123,7 +123,7 @@ namespace myos
             Port8BitSlow picMasterData;
             Port8BitSlow picSlaveCommand;
             Port8BitSlow picSlaveData;
-        } __attribute__((packed));
+        };
     }
 }
 
