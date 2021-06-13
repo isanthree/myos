@@ -20,7 +20,7 @@ private:
     uint8_t offset;  // 表示读取的是哪一个字节，初始值为 0
     uint8_t buttons;  // 标志按键的状态：按下状态 or 释放状态
 
-    uint8_t x, y;  // 坐标表示鼠标的位置
+    int8_t x, y;  // 坐标表示鼠标的位置，使用 int8_t 类型
 };
 
 #endif

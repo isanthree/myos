@@ -5,9 +5,9 @@
 
 GlobalDescriptorTable::GlobalDescriptorTable()
     : nullSegmentDescriptor(0, 0, 0),
-    unusedSegmentDescriptor(0, 0, 0),
-    codeSegmentDescriptor(0, 64*1024*1024, 0x9a),
-    dataSegmentDescriptor(0, 64*1024*1024, 0x92) 
+      unusedSegmentDescriptor(0, 0, 0),
+      codeSegmentDescriptor(0, 64*1024*1024, 0x9a),
+      dataSegmentDescriptor(0, 64*1024*1024, 0x92) 
 {
     uint32_t i[2];  // 定义存放 GDT 描述符(GDT descriptor)的数组
     i[1] = (uint32_t)this;

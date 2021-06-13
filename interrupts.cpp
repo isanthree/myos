@@ -37,10 +37,10 @@ void InterruptManager::SetInterruptDescriptorTableEntry(
 {
     const uint8_t IDT_DESC_PRESENT = 0x80;
     // handler 是一个指针
-    interruptDescriptorTable[interruptNumber].handleAddressLowBits = ((uint32_t)handler) & 0xffff;
-    interruptDescriptorTable[interruptNumber].handleAddressHighBits = ((uint32_t)handler >> 16) & 0xffff;
+    interruptDescriptorTable[interruptNumber].handlerAddressLowBits = ((uint32_t)handler) & 0xffff;
+    interruptDescriptorTable[interruptNumber].handlerAddressHighBits = ((uint32_t)handler >> 16) & 0xffff;
     interruptDescriptorTable[interruptNumber].gdt_codeSegmentSelector = codeSegmentSelectorOffset;  // 段选择子，即段的偏移
-    interruptDescriptorTable[interruptNumber].access = IDT_DESC_PRESENT | ((DescriptorPrivilegelLevel & 0x3) << 5) | DescriptorType;  // 设置访问权限
+    interruptDescriptorTable[interruptNumber].access = IDT_DESC_PRESENT | ((DescriptorPrivilegelLevel & 3) << 5) | DescriptorType;  // 设置访问权限
     interruptDescriptorTable[interruptNumber].reserved = 0;  // 保留默认为 0
 }
 
@@ -188,7 +188,7 @@ uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t e
         picMasterCommand.Write(0x20);  // EOI 对应的 OCW2 的值为 0x20
         if (interruptNumber >= hardwareInterruptOffset + 8)
         {
-            picMasterCommand.Write(0x20);
+            picSlaveCommad.Write(0x20);  // 修复鼠标无法移动的 bug 
         }
     }
     return esp;

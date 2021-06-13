@@ -43,11 +43,11 @@ protected:
     // 中断门描述符
     struct GateDescriptor
     {
-        uint16_t handleAddressLowBits;
+        uint16_t handlerAddressLowBits;
         uint16_t gdt_codeSegmentSelector;
         uint8_t reserved;  // 保留
         uint8_t access;  // 访问控制
-        uint16_t handleAddressHighBits;
+        uint16_t handlerAddressHighBits;
     } __attribute__((packed));
 
     static GateDescriptor interruptDescriptorTable[256];

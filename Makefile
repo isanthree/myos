@@ -1,4 +1,5 @@
-GPPPARAMS = -m32 -fno-use-cxa-atexit -fleading-underscore -fno-exceptions -nostdlib -fno-rtti -fno-pie
+GPPPARAMS = -m32 -fno-use-cxa-atexit -fleading-underscore -fno-exceptions -fno-builtin -nostdlib -fno-rtti -fno-pie
+
 ASPARAMS = --32
 LDPARAMS = -melf_i386 -no-pie
 
@@ -33,7 +34,7 @@ mykernel.iso: mykernel.bin
 	rm -rf iso/
 
 run: mykernel.iso
-	(killall virtualboxvm && sleep 1) || true
+	(killall virtualbox && sleep 1) || true
 	virtualbox --startvm "my os" &
 
 .PHONY: clean
