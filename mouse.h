@@ -4,13 +4,15 @@
 #include "types.h"
 #include "interrupts.h"
 #include "port.h"
+#include "driver.h"
 
-class MouseDriver : public InterruptHandler
+class MouseDriver : public InterruptHandler, public Driver
 {
 public:
     MouseDriver(InterruptManager* manager);
     ~MouseDriver();
     virtual uint32_t HandleInterrupt(uint32_t esp);
+    virtual void Activate();  // 定义抽象的激活函数
 
 private:
     Port8Bit dataport;

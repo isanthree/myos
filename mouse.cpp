@@ -9,6 +9,13 @@ MouseDriver::MouseDriver(InterruptManager* manager)
     x(40),
     y(12)
 {
+    
+}
+
+MouseDriver::~MouseDriver() {}
+
+void MouseDriver::Activate()
+{
     uint16_t* VideoMemory = (uint16_t*)0xb8000;  // 获取内存地址
     // 往这个内存地址做一些操作，这样可以获取到鼠标对应的位置
     VideoMemory[y*80+x] = ((VideoMemory[y*80+x] & 0xf000) >> 4) |
@@ -25,10 +32,7 @@ MouseDriver::MouseDriver(InterruptManager* manager)
     dataport.Read();
 }
 
-MouseDriver::~MouseDriver() {}
-
 void printf(const char*);
-
 uint32_t MouseDriver::HandleInterrupt(uint32_t esp)
 {
     uint8_t status = commandport.Read();  // 首先从 commandport 里面读取鼠标的状态

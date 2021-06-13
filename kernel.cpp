@@ -3,6 +3,7 @@
 #include "interrupts.h"
 #include "keyboard.h"
 #include "mouse.h"
+#include "driver.h"
 
 // 获取显示器的物理地址
 void printf(const char* str)
@@ -43,9 +44,29 @@ void printf(const char* str)
             }
             x = 0, y = 0;
         }
-
     }
 }
+
+void printfHex(uint8_t key)
+{
+    char* foo = (char*)"00\n";
+    const char* hex = "0123456789ABCDEF";
+    foo[22] = hex[(key >> 4) & 0x0f];
+    foo[23] = hex[key & 0x0f];
+    printf((const char*)foo);
+}
+
+class PrintKeyboardEventHandler : public KeyboardEventHandler
+{
+public:
+    void OnKeyDown(char c)
+    {
+        char* foo = " ";
+        foo[0] = c;
+        printf(foo);
+    }
+
+};
 
 typedef void (*constructor)();
 extern "C" constructor start_ctors;
@@ -68,8 +89,17 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     GlobalDescriptorTable gdt;
     InterruptManager interrupts(0x20, &gdt);
 
-    KeyBoardDriver keyboard(&interrupts);  // 中断开启前，keyboard 进行初始化
+    DriverManager drvManager;
+    PrintKeyboardEventHandler kbhandler;  // keyboard handler
+    
+    KeyBoardDriver keyboard(&interrupts, &kbhandler);  // 中断开启前，keyboard 进行初始化
+    drvManager.AddDriver(&keyboard);  // 把 keyboard 放到 drvManager 里面
+    
     MouseDriver mouse(&interrupts);
+    drvManager.AddDriver(&mouse);  // 把 mouse 放到 drvManager 里面
+
+    drvManager.ActivateAll();  // 激活所有驱动
+    
     interrupts.Activate();  // 开启中断
 
     while(1);
