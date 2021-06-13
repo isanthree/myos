@@ -4,6 +4,7 @@
 #include "drivers/keyboard.h"
 #include "drivers/mouse.h"
 #include "drivers/driver.h"
+#include "hardwarecommunication/pci.h"
 
 using namespace myos;
 using namespace myos::common;
@@ -54,10 +55,12 @@ void printf(const char *str)
 
 void printfHex(uint8_t key)
 {
-    char *foo = (char *)"00\n";
+    char *foo = (char *)"00";
     const char *hex = "0123456789ABCDEF";
-    foo[22] = hex[(key >> 4) & 0x0f];
-    foo[23] = hex[key & 0x0f];
+    // foo[22] = hex[(key >> 4) & 0x0f];
+    // foo[23] = hex[key & 0x0f];
+    foo[0] = hex[(key >> 4) & 0x0f];
+    foo[1] = hex[key & 0x0f];
     printf((const char *)foo);
 }
 
@@ -101,7 +104,7 @@ public:
         else if (x >= 80)
             x = 79;
 
-        y += ny;
+        y -= ny;
         if (y < 0)
             y = 0;
         else if (y >= 25)
@@ -146,6 +149,9 @@ extern "C" void kernelMain(void *multiboot_structure, uint32_t magicnumber)
     MouseToConsole mousehandler;
     MouseDriver mouse(&interrupts, &mousehandler);
     drvManager.AddDriver(&mouse); // 把 mouse 放到 drvManager 里面
+
+    PeripheralComponentInterconnectController PCIController;
+    PCIController.SelectDrivers(&drvManager);
 
     drvManager.ActivateAll(); // 激活所有驱动
 
