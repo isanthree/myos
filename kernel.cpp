@@ -61,11 +61,51 @@ class PrintKeyboardEventHandler : public KeyboardEventHandler
 public:
     void OnKeyDown(char c)
     {
-        char* foo = " ";
+        char* foo = (char*)" ";
         foo[0] = c;
         printf(foo);
     }
 
+};
+
+class MouseToConsole : public MouseEventHandler
+{
+public:
+    MouseToConsole() : x(40), y(12) {}
+
+    void OnActivate()
+    {
+        uint16_t* VideoMemory = (uint16_t*)0xb8000;  // 获取内存地址
+        // 往这个内存地址做一些操作，这样可以获取到鼠标对应的位置
+        VideoMemory[y*80+x] = ((VideoMemory[y*80+x] & 0xf000) >> 4) |
+                              ((VideoMemory[y*80+x] & 0x0f00) << 4) |
+                              (VideoMemory[y*80+x] & 0x00ff);
+    }
+
+    // 重载方法
+    void OnMouseMove(int8_t nx, int8_t ny)
+    {
+        uint16_t* VideoMemory = (uint16_t*)0xb8000;  // 获取内存地址
+        // 往这个内存地址做一些操作，这样可以获取到鼠标对应的位置
+        VideoMemory[y*80+x] = ((VideoMemory[y*80+x] & 0xf000) >> 4) |
+                              ((VideoMemory[y*80+x] & 0x0f00) << 4) |
+                              (VideoMemory[y*80+x] & 0x00ff);
+        // 鼠标往右移动：x 增大；鼠标往下移动：y 增大，但是 buffer[2] 是相反的，取一下反
+        x += nx;
+        if (x < 0) x = 0;
+        else if (x >= 80) x = 79;
+
+        y += ny;
+        if (y < 0) y = 0;
+        else if (y >= 25) y = 24;
+
+        VideoMemory[y*80+x] = ((VideoMemory[y*80+x] & 0xf000) >> 4) |
+                              ((VideoMemory[y*80+x] & 0x0f00) << 4) |
+                              (VideoMemory[y*80+x] & 0x00ff);
+
+    }
+private:
+    int8_t x, y;
 };
 
 typedef void (*constructor)();
@@ -90,12 +130,13 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     InterruptManager interrupts(0x20, &gdt);
 
     DriverManager drvManager;
+
     PrintKeyboardEventHandler kbhandler;  // keyboard handler
-    
     KeyBoardDriver keyboard(&interrupts, &kbhandler);  // 中断开启前，keyboard 进行初始化
     drvManager.AddDriver(&keyboard);  // 把 keyboard 放到 drvManager 里面
     
-    MouseDriver mouse(&interrupts);
+    MouseToConsole mousehandler;
+    MouseDriver mouse(&interrupts, &mousehandler);
     drvManager.AddDriver(&mouse);  // 把 mouse 放到 drvManager 里面
 
     drvManager.ActivateAll();  // 激活所有驱动
