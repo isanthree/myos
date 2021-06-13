@@ -29,7 +29,6 @@ install: mykernel.bin
 	sudo cp $< /boot/mykernel.bin
 
 mykernel.iso: mykernel.bin
-	rm -rf iso/
 	mkdir iso
 	mkdir iso/boot
 	mkdir iso/boot/grub
@@ -42,7 +41,7 @@ mykernel.iso: mykernel.bin
 	echo '  boot' >> iso/boot/grub/grub.cfg
 	echo '}' >> iso/boot/grub/grub.cfg
 	grub-mkrescue --output=$@ iso
-	rm -rf iso/
+	rm -rf iso
 
 run: mykernel.iso
 	(killall virtualbox && sleep 1) || true
